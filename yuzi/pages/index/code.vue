@@ -7,10 +7,14 @@
 					<view class="title">裕子欢迎您</view>
 					<view class="en">YU ZI HUAN YING NIN</view>
 					<view class="details">
-						<view class="qrcode">
-							<image v-if="shareImg != ''" :src="shareImg" mode="" class=""/>
+						<view class="qrcode" v-if="needLongTapSaveImg == false">
+							<canvas :style="{ width: picWidth + 'px', height: picHight + 'px' }"
+							canvas-id="myCanvas" id="myCanvas"></canvas>
 						</view>
-						<view class="linkBtn" @tap="jieQu()">保存</view>
+						<view class="qrcode qrcodeImg" v-if="needLongTapSaveImg">
+							<image v-if="hbUrl != ''" :src="hbUrl" mode="" />
+						</view>
+						<view class="linkBtn" @tap="saveHB()">保存</view>
 					</view>
 				</view>
 			</view>
@@ -26,16 +30,112 @@
 		},
 		data(){
 			return{
-				num: '',
+				canvasW: 0, // 画布宽
+				canvasH: 0, // 画布高
+				picWidth: '', //图片宽
+				picHight: '', //图片高
+				SystemInfo: {}, // 设备信息
+				goodsImg: {}, // 主图
+				ewmW: 200, // 二维码大小
+				hbUrl: ''  ,// 保存的图片地址
+				needLongTapSaveImg: false,
 			}
 		},
 		onLoad() {
 			
 		},
 		onShow() {
+			this.getMyCanvas();
 			this.shareImg = this.creatQrcode('123123');
 		},
 		methods: {
+			async getMyCanvas(){
+				let that = this;
+				// 获取设备信息，获取设备的宽高，画布做一样的高度
+				that.SystemInfo = await that.getSystemInfo();
+				console.log('that.SystemInfo', that.SystemInfo)
+				that.canvasW = that.SystemInfo.windowWidth; // 画布宽度
+				that.canvasH = that.SystemInfo.windowHeight - 150; //画布高度
+				that.picWidth = that.canvasW - 900;
+				that.picHight = that.picWidth - 900;
+				// uni.showLoading({
+				// 	title: "二维码生成中"
+				// })
+				setTimeout(() => {
+					var ctx = uni.createCanvasContext('myCanvas');
+					// 填充背景色，白色
+					// ctx.setFillStyle('#fff'); // 默认白色
+					// ctx.fillRect(0, 0, that.canvasW, that.canvasH) // fillRect(x,y,宽度，高度)
+					// 绘制二维码
+					ctx.drawImage(that.shareImg, 70, 0, 160, 200)
+					ctx.draw(true, (ret) => { // draw方法 把以上内容画到 canvas 中。
+						// uni.hideLoading();
+						uni.canvasToTempFilePath({ // 保存canvas为图片
+							canvasId: 'myCanvas',
+							quality: 1,
+							complete: (res) => {
+								// console.log("保存的图片：",res.tempFilePath);
+								that.hbUrl = res.tempFilePath;
+								//#ifdef H5
+								that.needLongTapSaveImg = true;
+								//#endif
+								console.log('ok---二维码生成中',that.needLongTapSaveImg);
+							},
+						})
+					});
+				}, 1000)
+			},
+			saveHB() {
+				console.log('点击了图片');
+				let that = this;
+				if(that.tempFilePath == ''){
+					uni.showToast({
+						title: '图片未生成',
+						icon: 'none'
+					})
+					return;
+				}
+				//#ifndef H5
+				uni.saveImageToPhotosAlbum({
+					filePath: that.tempFilePath,
+					success: function() {
+						uni.showToast({
+							title: '已保存至相册',
+							icon: 'none'
+						})
+					}
+				});
+				//#endif
+				//#ifdef H5
+				uni.showToast({
+					title: '请长按图片-保存至相册'
+				})
+				//#endif
+				return;
+				uni.saveImageToPhotosAlbum({
+					filePath: that.hbUrl,
+					success: function(res2) {
+						uni.showToast({
+							title: '保存成功，请从相册选择再分享',
+							icon: "none",
+							duration: 5000
+						})
+					},
+					fail: function(err) {
+						// console.log(err.errMsg);
+					}
+				})
+			},
+			// 获取设备信息
+			getSystemInfo() {
+				return new Promise((req, rej) => {
+					uni.getSystemInfo({
+						success: function(res) {
+							req(res)
+						}
+					});
+				})
+			},
 			creatQrcode(url) {
 				if (url == '') {
 					return false;
@@ -126,7 +226,7 @@
 			justify-content: flex-start;
 			align-items: center;
 			.title{
-				font-size: 88rpx;
+				font-size: 70rpx;
 				font-family: PangMenZhengDao-3-Regular, PangMenZhengDao-3;
 				font-weight: 400;
 				color: #FFFFFF;
@@ -144,6 +244,16 @@
 					image{
 						width: 100%;
 						height: 100%;
+					}
+				}
+				.qrcodeImg{
+					width: 100%;
+					height: 300rpx;
+					margin: 0 auto 40rpx;
+					image{
+						width: 100%;
+						height: 100%;
+						margin: auto;
 					}
 				}
 				.linkBtn{
