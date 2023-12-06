@@ -38,7 +38,7 @@
 					<image src="@/static/address.png" mode=""></image>
 					<view class="itemBox">
 						<view class="title">服务网点</view>
-						<view class="tips">看看距离服务网点多远</view>
+						<view class="tips">看看距离服务网点有多远</view>
 					</view>
 				</view>
 			</view>
