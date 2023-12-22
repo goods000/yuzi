@@ -34,7 +34,7 @@
 						<view class="tips">识别二维码，关注官方微信</view>
 					</view>
 				</view>
-				<view class="middel-item">
+				<view class="middel-item" @tap.stop="getUrl()">
 					<image src="@/static/address.png" mode=""></image>
 					<view class="itemBox">
 						<view class="title">服务网点</view>
@@ -66,12 +66,44 @@
 					'../../static/1.png','../../static/2.png','../../static/3.png'
 				],
 				current: 0,
+				longitude: '', // 经度
+				latitude: '', // 纬度
 			}
 		},
 		onLoad() {
-
+		},
+		onShow() {
+			this.getWei();
 		},
 		methods: {
+			// 导航
+			getUrl() {
+				let that = this;
+				uni.openLocation({
+					longitude: 114.03558,
+					latitude: 22.61527,
+					scale: 18,
+					name: "深圳北站",
+					address: "广东省深圳市龙华区深圳北站",
+				})
+			},
+			// 获取经纬度
+			getWei(){
+				let that = this;
+				uni.getLocation({
+					type: 'wgs84',   // gcj02 返回国测局坐标
+					success: function (res) {
+						console.log('当前位置的经度：' + res.longitude);
+						console.log('当前位置的纬度：' + res.latitude);
+						that.longitude = res.longitude;
+						that.latitude = res.latitude;
+					},
+					fail(err) {
+						//授权失败后，调用，可以在这儿调用下面的例子 再次进行授权
+						console.log(err, "eee");
+					},
+				});
+			},
 			// 联系我们
 			call(phone){
 				console.log(phone);

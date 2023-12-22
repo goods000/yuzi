@@ -14,7 +14,7 @@
 						<view class="qrcode qrcodeImg" v-if="needLongTapSaveImg">
 							<image v-if="hbUrl != ''" :src="hbUrl" mode="" />
 						</view>
-						<view class="linkBtn" @tap="saveHB()">保存</view>
+						<view class="linkBtn" @tap="saveHB()">长按二维码保存图片</view>
 					</view>
 				</view>
 			</view>
@@ -108,7 +108,8 @@
 				//#endif
 				//#ifdef H5
 				uni.showToast({
-					title: '请长按图片-保存至相册'
+					title: '请长按图片-保存至相册',
+					icon: 'none'
 				})
 				//#endif
 				return;
