@@ -5,7 +5,11 @@
 			"style": {
 				"navigationBarTitleText": "welcome",
 				"navigationBarBackgroundColor": "pink",
-				"navigationBarTextStyle": "white"
+				"navigationBarTextStyle": "white",
+				"bounce": "none",
+				"app-plus": {
+					"titleNView": false
+				}
 			}
 		},
 		{
