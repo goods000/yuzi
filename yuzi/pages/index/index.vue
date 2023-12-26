@@ -80,11 +80,11 @@
 			getUrl() {
 				let that = this;
 				uni.openLocation({
-					longitude: 114.03558,
-					latitude: 22.61527,
+					longitude: 114.78826,
+					latitude: 25.68058,
 					scale: 18,
-					name: "深圳北站",
-					address: "广东省深圳市龙华区深圳北站",
+					name: "SMART公寓",
+					address: "江西省赣州市南康区文峰大道SMART公寓",
 				})
 			},
 			// 获取经纬度
